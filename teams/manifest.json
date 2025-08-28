@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
   "id": "e35a467b-be35-4ec1-8fc6-dc7c23cde972",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "packageName": "com.vstntechnologies.teamsapp",
   "developer": {
     "name": "VSTN Technologies",
@@ -47,7 +47,7 @@
     "localhost:5173"
   ],
   "webApplicationInfo": {
-    "id": "e35a467b-be35-4ec1-8fc6-dc7c23cde972",
-    "resource": "api://localhost:5173/e35a467b-be35-4ec1-8fc6-dc7c23cde972"
+    "id": "e5e970b8-16d9-4194-ae15-4c6101ffed4f",
+    "resource": "api://localhost:5173/e5e970b8-16d9-4194-ae15-4c6101ffed4f"
   }
 }

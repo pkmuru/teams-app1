@@ -1,69 +1,63 @@
-# React + TypeScript + Vite
+# Microsoft Teams Tab App with SSO
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple "Hello World" Teams tab application with Single Sign-On (SSO) using Azure AD authentication.
 
-Currently, two official plugins are available:
+## Quick Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-## Expanding the ESLint configuration
+2. **Run development server**
+   ```bash
+   npm run dev
+   ```
+   App runs on https://localhost:5173
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+3. **Package for Teams**
+   ```bash
+   cd teams
+   # Create ZIP with manifest.json, color.png, outline.png
+   ```
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+4. **Upload to Teams**
+   - Teams → Apps → Upload a custom app
+   - Select ZIP file
+   - Add to team or personal use
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Configuration
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+See `TEAMS_APP_SETUP_GUIDE.md` for complete setup instructions including:
+- Azure AD configuration
+- Teams manifest setup
+- SSO implementation
+- Troubleshooting
+
+## Key Files
+
+- `src/config/app.config.ts` - All configuration constants
+- `teams/manifest.json` - Teams app manifest
+- `src/App.tsx` - Main app with SSO
+
+## Documentation
+
+- `TEAMS_APP_SETUP_GUIDE.md` - Complete setup and configuration guide
+- `CLEAR_TEAMS_CACHE.md` - How to clear Teams cache
+- `CONFIGURE_API_SCOPE_GUIDE.md` - Azure AD scope configuration
+- `TEAMS_CLIENT_IDS_DOCUMENTATION.md` - Microsoft Teams client IDs reference
+
+## Build
+
+```bash
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Technology Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- React 18 + TypeScript
+- Vite
+- Microsoft Teams SDK
+- Microsoft Graph Toolkit
+- Fluent UI React Components
+- Azure AD Authentication

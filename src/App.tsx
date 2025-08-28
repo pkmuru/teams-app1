@@ -1,31 +1,60 @@
-import { useEffect, useState } from 'react';
-import * as microsoftTeams from '@microsoft/teams-js';
-import { FluentProvider, webLightTheme, Button, Card, CardHeader, Text, Spinner } from '@fluentui/react-components';
-import { Person, Agenda } from '@microsoft/mgt-react';
-import { useTeamsAuth } from './auth/AuthProvider';
-import './App.css';
+import { useState, useEffect } from 'react';
+import { FluentProvider, webLightTheme, Button, Card, CardHeader, Text } from '@fluentui/react-components';
+import { useTeams } from './hooks/useTeams';
+import { TeamsUserCredential } from "@microsoft/teamsfx";
+import { authConfig } from './auth/AuthConfig';
 
 function App() {
-  const [inTeams, setInTeams] = useState(false);
-  const [context, setContext] = useState<microsoftTeams.app.Context | null>(null);
-  const { loading, error, isAuthenticated, login, consent } = useTeamsAuth();
+  const { inTeams, context, loading } = useTeams();
+  const [userName, setUserName] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [needConsent, setNeedConsent] = useState(false);
 
   useEffect(() => {
-    microsoftTeams.app.initialize().then(() => {
-      setInTeams(true);
-      microsoftTeams.app.getContext().then((context) => {
-        setContext(context);
-      });
-    }).catch(() => {
-      setInTeams(false);
-    });
-  }, []);
+    if (inTeams && !loading) {
+      getSSOToken();
+    }
+  }, [inTeams, loading]);
+
+  const getSSOToken = async () => {
+    try {
+      const credential = new TeamsUserCredential(authConfig);
+      const token = await credential.getToken(["User.Read"]);
+      
+      if (token && token.token) {
+        // Get user info from token
+        const userInfo = await credential.getUserInfo();
+        setUserName(userInfo.displayName || userInfo.preferredUserName || "User");
+        setError("");
+      }
+    } catch (err: any) {
+      console.error("SSO Error:", err);
+      if (err.message?.includes("consent")) {
+        setNeedConsent(true);
+        setError("Please grant permissions to continue");
+      } else {
+        setError("Authentication failed. Please try again.");
+      }
+    }
+  };
+
+  const handleConsent = async () => {
+    try {
+      const credential = new TeamsUserCredential(authConfig);
+      await credential.login(["User.Read"]);
+      await getSSOToken();
+      setNeedConsent(false);
+    } catch (err) {
+      console.error("Consent error:", err);
+      setError("Failed to complete consent flow");
+    }
+  };
 
   if (loading) {
     return (
       <FluentProvider theme={webLightTheme}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <Spinner size="large" label="Initializing Teams app..." />
+        <div style={{ padding: '20px' }}>
+          <Text>Loading...</Text>
         </div>
       </FluentProvider>
     );
@@ -33,54 +62,47 @@ function App() {
 
   return (
     <FluentProvider theme={webLightTheme}>
-      <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+      <div style={{ padding: '20px' }}>
         <Card>
           <CardHeader
-            header={<Text size={500} weight="semibold">Teams Tab App with SSO</Text>}
-            description={
-              <Text size={200}>
-                {inTeams ? `Running in Teams (${context?.app?.host?.name || 'Unknown'})` : 'Running outside Teams'}
-              </Text>
-            }
+            header={<Text size={500} weight="semibold">Hello World - Teams Tab with SSO</Text>}
           />
-          
           <div style={{ padding: '20px' }}>
-            {!isAuthenticated ? (
-              <div style={{ textAlign: 'center' }}>
-                <Text block style={{ marginBottom: '20px' }}>
-                  Please sign in to access Microsoft Graph data
+            {inTeams ? (
+              <>
+                <Text block style={{ marginBottom: '10px' }}>
+                  ✅ Running in Microsoft Teams
                 </Text>
-                <Button appearance="primary" onClick={login}>
-                  Sign In
-                </Button>
-                {error && (
-                  <div style={{ marginTop: '20px' }}>
-                    <Text style={{ color: 'red' }}>{error}</Text>
-                    {error.includes('consent') && (
-                      <div style={{ marginTop: '10px' }}>
-                        <Button appearance="secondary" onClick={consent}>
-                          Grant Permissions
-                        </Button>
-                      </div>
-                    )}
+                {userName ? (
+                  <Text block size={400}>
+                    Hello, <strong>{userName}</strong>! 👋
+                  </Text>
+                ) : (
+                  <Text block>Authenticating...</Text>
+                )}
+                {context && (
+                  <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                    <Text size={200} block>Team: {context.team?.displayName || 'Personal'}</Text>
+                    <Text size={200} block>Channel: {context.channel?.displayName || 'N/A'}</Text>
                   </div>
                 )}
-              </div>
+              </>
             ) : (
-              <div>
-                <div style={{ marginBottom: '30px' }}>
-                  <Text size={400} weight="semibold" block style={{ marginBottom: '10px' }}>
-                    Your Profile
-                  </Text>
-                  <Person personQuery="me" view="threelines" />
-                </div>
-                
-                <div>
-                  <Text size={400} weight="semibold" block style={{ marginBottom: '10px' }}>
-                    Your Calendar
-                  </Text>
-                  <Agenda />
-                </div>
+              <Text block>
+                ⚠️ This app needs to run inside Microsoft Teams
+              </Text>
+            )}
+            
+            {error && (
+              <div style={{ marginTop: '20px' }}>
+                <Text style={{ color: 'red' }}>{error}</Text>
+                {needConsent && (
+                  <div style={{ marginTop: '10px' }}>
+                    <Button appearance="primary" onClick={handleConsent}>
+                      Grant Permissions
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>

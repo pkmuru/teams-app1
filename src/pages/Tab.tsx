@@ -1,30 +1,48 @@
-import { useEffect, useState } from 'react';
-import * as microsoftTeams from '@microsoft/teams-js';
-import { FluentProvider, webLightTheme, Button, Card, CardHeader, Text, Spinner } from '@fluentui/react-components';
-import { Person, Agenda } from '@microsoft/mgt-react';
-import { useTeamsAuth } from '../auth/AuthProvider';
+import { useState, useEffect } from 'react';
+import { FluentProvider, webLightTheme, Button, Card, CardHeader, Text } from '@fluentui/react-components';
+import { useTeams } from '../hooks/useTeams';
+import { TeamsUserCredential } from "@microsoft/teamsfx";
+import { authConfig } from '../auth/AuthConfig';
 
 export const Tab = () => {
-  const [inTeams, setInTeams] = useState(false);
-  const [context, setContext] = useState<microsoftTeams.app.Context | null>(null);
-  const { loading, error, isAuthenticated, login, consent } = useTeamsAuth();
+  const { inTeams, context, loading } = useTeams();
+  const [userName, setUserName] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    microsoftTeams.app.initialize().then(() => {
-      setInTeams(true);
-      microsoftTeams.app.getContext().then((context) => {
-        setContext(context);
-      });
-    }).catch(() => {
-      setInTeams(false);
-    });
-  }, []);
+    if (inTeams && !loading) {
+      getSSOToken();
+    }
+  }, [inTeams, loading]);
+
+  const getSSOToken = async () => {
+    try {
+      const credential = new TeamsUserCredential(authConfig);
+      const userInfo = await credential.getUserInfo();
+      setUserName(userInfo.displayName || userInfo.preferredUserName || "User");
+      setError("");
+    } catch (err: any) {
+      console.error("SSO Error:", err);
+      setError("Please configure SSO in your Azure AD app");
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const credential = new TeamsUserCredential(authConfig);
+      await credential.login(["User.Read"]);
+      await getSSOToken();
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Login failed");
+    }
+  };
 
   if (loading) {
     return (
       <FluentProvider theme={webLightTheme}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <Spinner size="large" label="Initializing Teams tab..." />
+        <div style={{ padding: '20px' }}>
+          <Text>Loading Teams context...</Text>
         </div>
       </FluentProvider>
     );
@@ -32,77 +50,32 @@ export const Tab = () => {
 
   return (
     <FluentProvider theme={webLightTheme}>
-      <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ padding: '20px' }}>
         <Card>
           <CardHeader
-            header={<Text size={500} weight="semibold">Teams Tab - {context?.channel?.displayName || 'Channel'}</Text>}
-            description={
-              <Text size={200}>
-                {inTeams ? `Team: ${context?.team?.displayName || 'Unknown'} | Tenant: ${context?.user?.tenant?.id || 'Unknown'}` : 'Running outside Teams'}
-              </Text>
-            }
+            header={<Text size={500} weight="semibold">Teams Tab - Hello World</Text>}
           />
-          
           <div style={{ padding: '20px' }}>
-            {!isAuthenticated ? (
-              <div style={{ textAlign: 'center' }}>
-                <Text block style={{ marginBottom: '20px' }}>
-                  Please sign in to access your Microsoft 365 data
-                </Text>
-                <Button appearance="primary" onClick={login}>
-                  Sign In with Microsoft
-                </Button>
-                {error && (
-                  <div style={{ marginTop: '20px' }}>
-                    <Text style={{ color: 'red' }}>{error}</Text>
-                    {error.includes('consent') && (
-                      <div style={{ marginTop: '10px' }}>
-                        <Button appearance="secondary" onClick={consent}>
-                          Grant Permissions
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
+            <Text block size={400}>
+              {userName ? `Hello, ${userName}! 👋` : 'Welcome to Teams Tab!'}
+            </Text>
+            
+            {context && (
+              <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                <Text size={300} block weight="semibold">Teams Context:</Text>
+                <Text size={200} block>Team: {context.team?.displayName || 'Personal App'}</Text>
+                <Text size={200} block>Channel: {context.channel?.displayName || 'N/A'}</Text>
+                <Text size={200} block>User: {context.user?.userPrincipalName}</Text>
               </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '20px' }}>
-                <div>
-                  <Card>
-                    <CardHeader header={<Text size={400} weight="semibold">Your Profile</Text>} />
-                    <div style={{ padding: '16px' }}>
-                      <Person personQuery="me" view="twolines" showPresence={true} />
-                    </div>
-                  </Card>
-                  
-                  {context && (
-                    <Card style={{ marginTop: '20px' }}>
-                      <CardHeader header={<Text size={400} weight="semibold">Team Context</Text>} />
-                      <div style={{ padding: '16px' }}>
-                        <Text size={200} block>
-                          <strong>Team:</strong> {context.team?.displayName || 'Personal'}
-                        </Text>
-                        <Text size={200} block>
-                          <strong>Channel:</strong> {context.channel?.displayName || 'N/A'}
-                        </Text>
-                        <Text size={200} block>
-                          <strong>User:</strong> {context.user?.userPrincipalName || 'Unknown'}
-                        </Text>
-                      </div>
-                    </Card>
-                  )}
-                </div>
-                
-                <div>
-                  <Card>
-                    <CardHeader 
-                      header={<Text size={400} weight="semibold">Your Calendar Events</Text>}
-                      description={<Text size={200}>Upcoming events from Microsoft 365</Text>}
-                    />
-                    <div style={{ padding: '16px' }}>
-                      <Agenda />
-                    </div>
-                  </Card>
+            )}
+            
+            {error && (
+              <div style={{ marginTop: '20px' }}>
+                <Text style={{ color: 'red' }}>{error}</Text>
+                <div style={{ marginTop: '10px' }}>
+                  <Button appearance="primary" onClick={handleLogin}>
+                    Sign In
+                  </Button>
                 </div>
               </div>
             )}

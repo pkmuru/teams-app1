@@ -9,7 +9,6 @@ export default defineConfig({
     basicSsl() // This will generate self-signed certificates automatically
   ],
   server: {
-    port: 5173,
-    https: true
+    port: 5173
   },
 })

@@ -1,11 +1,15 @@
 import type { TeamsUserCredentialAuthConfig } from "@microsoft/teamsfx";
+import { APP_CONFIG } from "../config/app.config";
 
 export const authConfig: TeamsUserCredentialAuthConfig = {
-  clientId: import.meta.env.VITE_CLIENT_ID,
-  initiateLoginEndpoint: import.meta.env.VITE_START_LOGIN_PAGE_URL,
+  clientId: APP_CONFIG.CLIENT_ID,
+  initiateLoginEndpoint: APP_CONFIG.AUTH_START_URL,
 };
 
-export const graphScopes = ["User.Read", "Calendars.Read", "Mail.Read"];
+// Export tenant ID separately for use where needed
+export const tenantId = APP_CONFIG.TENANT_ID;
+
+export const graphScopes = APP_CONFIG.GRAPH_SCOPES;
 
 export const loginRequest = {
   scopes: graphScopes,
