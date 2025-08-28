@@ -18,7 +18,7 @@ export const APP_CONFIG = {
   
   // App URLs
   APP_URL: "https://localhost:5173",
-  AUTH_START_URL: "https://localhost:5173/auth-start",
+  AUTH_START_URL: "https://localhost:5173/#/auth-start",
   
   // Graph Scopes
   GRAPH_SCOPES: ["User.Read"],

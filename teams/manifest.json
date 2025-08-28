@@ -2,21 +2,21 @@
   "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
   "id": "e35a467b-be35-4ec1-8fc6-dc7c23cde972",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "packageName": "com.vstntechnologies.teamsapp",
   "developer": {
     "name": "VSTN Technologies",
     "websiteUrl": "https://localhost:5173",
-    "privacyUrl": "https://localhost:5173/privacy",
-    "termsOfUseUrl": "https://localhost:5173/terms-of-use"
+    "privacyUrl": "https://localhost:5173/#/privacy",
+    "termsOfUseUrl": "https://localhost:5173/#/terms-of-use"
   },
   "name": {
-    "short": "Teams Tab App",
-    "full": "Teams Tab App with SSO"
+    "short": "STAAT Assist",
+    "full": "STAAT Assist - Teams Assistant"
   },
   "description": {
-    "short": "A Teams tab app with SSO",
-    "full": "A Microsoft Teams tab application with Single Sign-On using Microsoft Graph"
+    "short": "STAAT Assist for Teams",
+    "full": "STAAT Assist - Your Teams assistant with Single Sign-On authentication"
   },
   "icons": {
     "outline": "outline.png",
@@ -25,7 +25,7 @@
   "accentColor": "#5558AF",
   "configurableTabs": [
     {
-      "configurationUrl": "https://localhost:5173/config",
+      "configurationUrl": "https://localhost:5173/#/config",
       "scopes": ["team", "groupchat"],
       "canUpdateConfiguration": true
     }
@@ -33,7 +33,7 @@
   "staticTabs": [
     {
       "entityId": "index",
-      "name": "Personal Tab",
+      "name": "STAAT Assist",
       "contentUrl": "https://localhost:5173/",
       "websiteUrl": "https://localhost:5173/",
       "scopes": ["personal"]

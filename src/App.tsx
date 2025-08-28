@@ -65,7 +65,7 @@ function App() {
       <div style={{ padding: '20px' }}>
         <Card>
           <CardHeader
-            header={<Text size={500} weight="semibold">Hello World - Teams Tab with SSO</Text>}
+            header={<Text size={500} weight="semibold">STAAT Assist</Text>}
           />
           <div style={{ padding: '20px' }}>
             {inTeams ? (

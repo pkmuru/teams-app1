@@ -1,54 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import * as microsoftTeams from '@microsoft/teams-js';
-import { FluentProvider, webLightTheme, Input, Card, CardHeader, Text, Field } from '@fluentui/react-components';
+import { FluentProvider, webLightTheme, Card, CardHeader, Text } from '@fluentui/react-components';
+import { Checkmark20Filled } from '@fluentui/react-icons';
 
 export const Config = () => {
-  const [tabName, setTabName] = useState('Hello World Tab');
-
   useEffect(() => {
     // Initialize Teams SDK
     microsoftTeams.app.initialize().then(() => {
       // Register save handler
       microsoftTeams.pages.config.registerOnSaveHandler((saveEvent) => {
-        // Configure the tab
+        // Configure the tab with fixed name
         microsoftTeams.pages.config.setConfig({
-          entityId: 'hello-world-tab',
-          contentUrl: `${window.location.origin}/tab`,
-          websiteUrl: `${window.location.origin}/tab`,
-          suggestedDisplayName: tabName,
+          entityId: 'staat-assist-tab',
+          contentUrl: `${window.location.origin}/#/tab`,
+          websiteUrl: `${window.location.origin}/#/tab`,
+          suggestedDisplayName: 'STAAT Assist',
         });
         saveEvent.notifySuccess();
       });
 
-      // Enable Save button
+      // Enable Save button immediately
       microsoftTeams.pages.config.setValidityState(true);
     });
   }, []);
-
-  useEffect(() => {
-    // Update validity when tab name changes
-    if (microsoftTeams.app.isInitialized()) {
-      microsoftTeams.pages.config.setValidityState(tabName.length > 0);
-    }
-  }, [tabName]);
 
   return (
     <FluentProvider theme={webLightTheme}>
       <div style={{ padding: '20px' }}>
         <Card>
           <CardHeader
-            header={<Text size={500} weight="semibold">Configure Tab</Text>}
+            header={<Text size={500} weight="semibold">Add STAAT Assist to Your Channel</Text>}
           />
-          <div style={{ padding: '20px' }}>
-            <Field label="Tab Name" required>
-              <Input
-                value={tabName}
-                onChange={(_, data) => setTabName(data.value)}
-                placeholder="Enter tab name"
-              />
-            </Field>
-            <Text size={200} block style={{ marginTop: '10px' }}>
-              This will be the name of your tab in the channel.
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            <Checkmark20Filled style={{ color: '#107c10', fontSize: '48px', marginBottom: '16px' }} />
+            <Text size={400} block style={{ marginBottom: '16px' }}>
+              <strong>STAAT Assist</strong> is ready to be added to your channel!
+            </Text>
+            <Text size={300} block style={{ color: '#605e5c' }}>
+              Click "Save" below to add STAAT Assist to this channel.
+            </Text>
+            <Text size={300} block style={{ marginTop: '16px', color: '#605e5c' }}>
+              Your team members will be able to access STAAT Assist directly from this tab.
             </Text>
           </div>
         </Card>

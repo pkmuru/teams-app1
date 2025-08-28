@@ -53,7 +53,7 @@ export const Tab = () => {
       <div style={{ padding: '20px' }}>
         <Card>
           <CardHeader
-            header={<Text size={500} weight="semibold">Teams Tab - Hello World</Text>}
+            header={<Text size={500} weight="semibold">STAAT Assist</Text>}
           />
           <div style={{ padding: '20px' }}>
             <Text block size={400}>
